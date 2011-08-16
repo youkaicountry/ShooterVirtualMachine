@@ -1,0 +1,49 @@
+
+fcode trace facility
+
+The fcode trace facility is an fcode debugging aid, currently only supported in the Java
+target.
+
+One new instruction, trace (#54), has been added to the VM.
+
+The trace instruction's exact effect is implementation- and target-dependent, subject
+   to the following restriction:
+
+The trace instruction can be implemented as a no-op instruction without changing the
+   semantics of the program.  It is only useful as a debugging aid.
+
+For the Java backend, the trace instruction currently supports two argument values,
+   immediate 0 and 1.  trace 1 will cause subsequent instructions to generate
+   debugging messages on stdout; trace 0 disables this extra information.  Note that
+   trace code generation is toggled on and off when the program is translated to Java,
+   not while it's running.  So the following code will result in a
+   a trace being produced when the send instruction is executed:
+
+   trace 0
+   jmp alpha
+   trace 1
+alpha:
+   send 1 0 __spawnid
+   trace 0
+
+This keeps the generated code from being swamped by enormous amounts of debugging code
+   to support the tracing of every instruction.  Tracing-capable code is generated
+   only for sections where the programmer requests it.
+
+traceInstructions : Set of fcodes that support tracing.
+fulltrace         : true -> turn on tracing for all instructions listed in traceInstructions.
+                    false -> turn on tracing only when instructed by the trace fcode
+op2args           : Specifies the behavior of the fcode.  Four-letter string, the ith
+                    letter specifies "i" for input, "o" for output, " " for ignored.
+                    The trace facility prints input arguments before the instruction
+                    executes and output arguments after the instruction executes.
+op2name           : Specifies the human-readable name of the fcode.
+                    The trace facility identifies the instruction by this name.
+
+Currently only the messaging instructions support tracing.  Adding tracing support to an
+   instruction is simple:
+      (1) Add the opcode and appropriate descriptive information to op2args, op2name,
+          and traceInstructions in f2j.py
+      (2) Recompile and run your fcode
+      (3) Profit!!
+

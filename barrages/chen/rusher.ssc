@@ -1,0 +1,13 @@
+init:
+setjmptimer deathtimer 300 die
+addfrcfac 3
+
+loop:
+inctimer deathtimer 1
+update
+halt 1
+jmp loop
+
+die:
+terminate
+

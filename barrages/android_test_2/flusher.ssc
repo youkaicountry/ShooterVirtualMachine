@@ -1,0 +1,19 @@
+decl deathtimer r0
+decl speed r1
+
+#set the spawned bullet's r1 to set initial speed
+init:
+addfacevel speed
+addfaceacc .0008
+setjmptimer deathtimer 100 die
+mov __radius .01
+
+loop:
+inctimer deathtimer
+update
+halt
+jmp loop
+
+die:
+terminate
+

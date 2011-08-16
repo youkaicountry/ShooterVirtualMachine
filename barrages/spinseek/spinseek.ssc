@@ -1,0 +1,27 @@
+init:
+setjmptimer goseeker 150 startseeking
+turn -1.57
+
+ptncircle 100 -6 #starts moving in a circle from facing angle
+loop:
+inctimer goseeker 1
+update
+halt 1
+jmp loop
+
+startseeking:
+getstate t __angle
+ifjmp t < 1.57 playerseek
+update
+halt 1
+jmp startseeking
+
+playerseek:
+stopmove
+tgtplayer
+factgt
+sploop:
+movefac 6
+halt 1
+jmp sploop
+

@@ -1,0 +1,38 @@
+import flusher.ssc
+import swirler.ssc
+
+decl flushtimer r0
+
+init:
+setcalltimer flushtimer 40 flush
+call makeswirlers
+
+loop:
+inctimer flushtimer
+halt
+jmp loop
+
+makeswirlers:
+tgtplayer
+facetgt
+call makeswirler
+turn 2.0943951
+call makeswirler
+turn 2.0943951
+call makeswirler
+return
+
+flush:
+tgtplayer
+facetgt
+tgtself
+spawntgt flusher.init
+return
+
+makeswirler:
+moveface 10
+tgtself
+spawntgt swirler.init
+moveface -10
+return
+

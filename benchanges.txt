@@ -1,0 +1,59 @@
+Sumary of changes made:
+  * Was crashing due to the first loop in run() being just plain wrong :)
+  * fcompile.py no longer outputs python or intermediate targets (which
+    crash on unrecognized instructions)
+  * spawnThread now writes the new thread into scheduled_threads so new threads
+    start executing in the current cycle.  Control is immediately returned to the
+    parent thread, however, so it can initialize state, send messages, etc. before
+    the children are executed.
+  * Modified instruction spec.  Now the order of message fields in recv and recvwait is
+       always type,data,sender.  You have the spec, I don't, so you'll have to rewrite it
+       yourself :)
+       This is for symmetry between send and receive.
+
+       send mt,md,target <-> recvwait mt,md,source
+
+  * The terminate instruction now ends a block.  It was producing unreachable code before
+       I fixed it.
+  * Added trace facility.  Really powerful tool for debugging your fcode programs.
+      See bentrace.txt.
+  * Added template parameter to ShooterVirtualMachine and @SuppressWarnings("all") to
+      the generated class.  The code compiles without warnings now.
+  * The acceptmsg instruction has changed.  A thread now has two messaging states:
+      Filtered and non-filtered mode.  Non-filtered mode is the default, the type
+      parameter is just an extra field in non-filtered mode.  A thread enters filtered
+      mode by executing an acceptmsg instruction.  A thread in filtered mode
+      maintains as part of its state a separate queue for each accepted message type.
+      A filtered-mode thread also maintains all messages it received while it was in
+      non-filtered mode ("legacy messages") until its death.  When an acceptmsg
+      instruction is executed, legacy messages that match the newly accepted message type
+      are enqueued in the queue for that message type.  Without this, creating a
+      thread and immediately sending it a message resulted in the message being swallowed
+      when the child switched to filtered mode.
+   * Added AWT code.  Changes in GraphicsThread.java are just changing package names.
+     Main.java (new file) launches the AWT client in a window.  Implementation is in
+     package org.newgameplus.andawt.  If you use more graphics Android functions,
+     you need to add an AWT implementation of them to Canvas.java.
+   * An Android Canvas is equivalent to an AWT Graphics2D, and an AWT Canvas is
+     equivalent to an Android...I don't even know.  Anyway, BridgeCanvas is an AWT
+     component that implements the canvas.
+   * Added an isDone() function to the generated code.  Returns true when all threads
+     have terminated.
+   * The AWT client exits when isDone() returns true.  Handy for testing things,
+     especially when combined with traces.  See the main loop in GraphicsThread
+     for the client change (just check if isDone() and if so, terminate)
+   * TODO: Support resizing the AWT client.
+   * TODO: Applet client.
+   * TODO: recv is completely untested :)
+   * TODO:  There should be an object pool for old message queues.  Currently the
+      filtered -> nonfiltered transition that takes place when a thread is recycled
+      releases all the queues for its filtered messages, which will be reallocated if
+      it's resurrected as a filtered-mode thread.  This will be a fairly well-trod
+      execution path in compiled code.
+   * TODO:  Suspend threads initially.  I.e. have creating a thread object and
+     running that object be two different steps.
+   * TODO:  Re-implement sleeping (halt instruction) with messages.
+   * TODO:  Re-implement setcalltimer high level instruction with messages.
+   * TODO: Add a daemon mark to threads.  isDone() will return true when there are
+      only daemon threads remaining.  Not really important for Shooter, but useful
+      in general purpose programming.  (Java's threading API has this feature.)

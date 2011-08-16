@@ -1,0 +1,28 @@
+import bumbler.ssc
+
+init:
+setcalltimer bumblertimer 320 makebumbler
+getstate initx __x
+mov mover 0
+mov moveradd .03
+mov sinmul 200
+mov newx 0
+
+mainloop:
+
+#get new x location
+add mover moveradd
+mov moverbackup mover
+sin moverbackup
+mul moverbackup sinmul
+add moverbackup initx
+setstate __x moverbackup
+inctimer bumblertimer 1
+halt 1
+jmp mainloop
+
+makebumbler:
+tgtself
+spawnchild bumbler 20
+return 0
+

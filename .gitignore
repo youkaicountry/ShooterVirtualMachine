@@ -1,0 +1,11 @@
+*.pyc
+*~
+*#
+*#*
+output/
+pythonbinding/
+ftest/
+*.png
+*.jpg
+*.jpeg
+*.bmp

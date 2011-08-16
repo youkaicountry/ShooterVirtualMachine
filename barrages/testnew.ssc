@@ -1,0 +1,24 @@
+import testnew2.ssc
+decl tx r0
+decl ty r1
+init:
+#mov __velx 1
+#mov __vely .5
+#mov __thrustvel 2
+mov __userad 0.0
+mov __rotvel 1
+tgtself
+loop:
+turn .03
+tgt __playerx __playery
+update
+movechildren
+halt
+turn 3.14
+tgtself
+spawntgt testnew2.init
+turn -3.14
+jmp loop
+loop2:
+ifjmp r0 >= r1 loop2
+

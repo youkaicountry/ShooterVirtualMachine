@@ -1,0 +1,15 @@
+init:
+decl deathclock r10
+addfaceacc .00001
+setjmptimer deathclock 300 die
+
+loop:
+inctimer deathclock
+addfaceacc .0000001
+update
+halt 1
+jmp loop
+
+die:
+terminate
+

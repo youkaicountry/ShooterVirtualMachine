@@ -1,0 +1,38 @@
+import wingpart.ssc
+decl n r5
+decl wingspeed r6
+decl i r7
+decl t r8
+decl waittime r9
+decl sendmode r10
+init:
+tgtself
+mov n 5
+mov i 0
+mov wingspeed 1
+mov waittime 56
+mov sendmode 0
+loop:
+ifjmp i >= n endloop
+mov t 1
+add t i
+mul t wingspeed
+spawntgt wingpart.init
+stv __velx t __spawnid
+mul t -1
+spawntgt wingpart.init
+stv __velx t __spawnid
+add i 1
+jmp loop
+endloop:
+halt waittime
+forallchildren r0 r1 sendstop
+done:
+halt
+jmp done
+
+
+sendstop:
+stv r0 1 r0
+stv r10 sendmode r0 #set mode of children
+return

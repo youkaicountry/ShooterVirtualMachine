@@ -1,0 +1,29 @@
+import accelbullet.ssc
+
+init:
+decl mtimer r10
+setcalltimer mtimer 1 make
+#addfacevel .001
+
+loop:
+inctimer mtimer
+halt 1
+jmp loop
+
+make:
+turn .4
+call spawnit
+turn .4
+call spawnit
+return 0
+
+spawnit:
+push __x
+push __y
+#moveface .01
+tgtself
+pop __y
+pop __x
+spawntgt accelbullet.init
+return 0
+

@@ -1,0 +1,47 @@
+import straight.ssc
+decl stopmessage r0
+decl mode r10
+decl t r1
+decl modetimer r8
+init:
+setjmptimer modetimer 50 selectmode
+loop:
+update
+halt
+ifjmp stopmessage == 1 selectmode
+jmp loop
+
+selectmode:
+ifjmp mode == 0 moderandangle
+ifjmp mode == 1 modeblocks
+jmp selectmode
+
+moderandangle:
+mov mode 1
+.loop:
+inctimer modetimer
+rnd t
+mul t 1.57079633
+add t 0.785398163
+mov __angle t
+tgtself
+spawntgt straight.init
+stv __thrustvel 3 __spawnid
+halt 5
+jmp moderandangle.loop
+
+modeblocks:
+.loop:
+tgtself
+mov __angle 2.35619449
+spawntgt straight.init
+stv __thrustvel 5 __spawnid
+mov __angle 1.57079633
+spawntgt straight.init
+stv __thrustvel 5 __spawnid
+mov __angle 0.785398163
+spawntgt straight.init
+stv __thrustvel 5 __spawnid
+halt 4
+jmp modeblocks.loop
+

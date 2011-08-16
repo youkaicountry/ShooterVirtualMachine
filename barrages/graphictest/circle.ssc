@@ -1,0 +1,17 @@
+mov timer 200
+
+loop:
+movefac 1
+turn .1
+
+sub timer 1
+mov t timer
+leq t 0
+if t
+cndjmp die
+
+halt 1
+jmp loop
+
+die:
+terminate

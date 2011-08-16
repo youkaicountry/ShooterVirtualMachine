@@ -1,0 +1,14 @@
+init:
+addaccfac .01
+settimer deathclock 300 die jmp
+
+loop:
+inctimer deathclock 1
+addaccfac .0001
+update
+halt 1
+jmp loop
+
+die:
+terminate
+

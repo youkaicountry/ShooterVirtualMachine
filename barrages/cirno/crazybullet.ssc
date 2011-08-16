@@ -1,0 +1,31 @@
+decl stopmessage   r0
+decl bubblemessage r1
+decl deathtimer r2
+init:
+   setjmptimer deathtimer 200 die
+loop:
+   ifjmp stopmessage == 1 stop
+   update
+   halt
+   jmp loop
+   
+stop:
+   mov __thrustvel 0
+stoploop:
+   ifjmp bubblemessage == 1 bubble
+   halt
+   jmp stoploop
+   
+bubble:
+   rnd __angle
+   mul __angle 6.28318531
+   mov __thrustacc .02
+bubbleloop:
+   inctimer deathtimer
+   update
+   halt
+   jmp bubbleloop
+   
+die:
+   terminate
+   

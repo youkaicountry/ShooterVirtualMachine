@@ -1,0 +1,12 @@
+init:
+mov __velx 1
+mov __vely 2
+loop:
+call turning
+halt
+update
+jmp loop
+turning:
+turn .01
+return
+

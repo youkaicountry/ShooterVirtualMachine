@@ -1,0 +1,14 @@
+init:
+acceptmsg 1
+recvwait 1 r0 r0 r0
+
+mov r5 7
+loop:
+send 2 1 __parentid
+send 3 r5 __parentid
+recvwait 1 r0 r0 r0
+add r5 3
+ifjmp r5 < 20 loop
+
+send 2 -1 __parentid
+terminate

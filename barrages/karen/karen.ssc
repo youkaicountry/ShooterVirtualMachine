@@ -1,0 +1,28 @@
+import straight.ssc
+decl angle r0
+decl shoottimer r1
+decl i r2
+decl n r3
+
+init:
+setcalltimer shoottimer 30 shoot
+
+loop:
+inctimer shoottimer
+halt
+jmp loop
+
+shoot:
+tgtself
+mov n 50
+mov angle 0
+div angle 6.28319 n
+mov i 0
+shootloop:
+spawntgt straight.init
+turn angle
+add i i 1
+ifjmp i >= n done
+jmp shootloop
+done:
+return

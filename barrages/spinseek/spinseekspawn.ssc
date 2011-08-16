@@ -1,0 +1,26 @@
+import spinseek.ssc
+
+init:
+getmem diff difficulty
+
+#get number to spawn @eval num=flr(diff*20)
+mov num 20
+mul num diff
+flr num
+
+#get angle @eval ang = 6.28318 / num
+mov ang 6.28318
+div ang num
+
+mov j 0
+whilecall j < num 1 spawn
+terminate
+
+spawn:
+turn ang
+movefac 100
+tgtself
+spawnchild spinseek 1
+movefac -100
+return 0
+

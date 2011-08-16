@@ -1,0 +1,27 @@
+import accelbullet.ssc
+
+init:
+settimer mtimer 1 make call
+
+loop:
+inctimer mtimer 1
+halt 1
+jmp loop
+
+make:
+turn .4
+call spawnit
+turn .4
+call spawnit
+return 0
+
+spawnit:
+pushstate __x
+pushstate __y
+movefac 20
+tgtself
+popstate __y
+popstate __x
+spawnchild accelbullet 1
+return 0
+

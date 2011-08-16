@@ -1,0 +1,56 @@
+import crazybullet.ssc
+init:
+   decl temp r1
+   decl shoottimer r10
+   setjmptimer shoottimer 200 freeze
+   
+shootloop:
+   inctimer shoottimer
+   call dospawn
+   halt
+   jmp shootloop
+   
+freeze:
+   forallchildren r1 r2 sendstop
+   halt 100
+   forallchildren r1 r2 sendbubble
+   halt 200
+   jmp shootloop
+   
+sendstop:
+   stv r0 1 r1
+   return
+   
+sendbubble:
+   stv r1 1 r1
+   return  
+   
+dospawn:
+   rnd __angle
+   mul __angle 6.28318531
+   tgtself
+   spawntgt crazybullet.init
+   rnd temp
+   mul temp 3
+   add temp 2
+   stv __thrustvel temp __spawnid
+   
+   rnd __angle
+   mul __angle 6.28318531
+   tgtself
+   spawntgt crazybullet.init
+   rnd temp
+   mul temp 3
+   add temp 2
+   stv __thrustvel temp __spawnid
+   
+   rnd __angle
+   mul __angle 6.28318531
+   tgtself
+   spawntgt crazybullet.init
+   rnd temp
+   mul temp 3
+   add temp 2
+   stv __thrustvel temp __spawnid
+   return
+   

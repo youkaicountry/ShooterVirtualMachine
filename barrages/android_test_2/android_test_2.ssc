@@ -1,0 +1,57 @@
+import flusher.ssc
+import swirler.ssc
+
+decl flushtimer r0
+decl temp r1
+decl m r2
+
+init:
+setcalltimer flushtimer 100 flush
+mov __radius .008
+call makeswirlers
+
+loop:
+inctimer flushtimer
+halt
+jmp loop
+
+makeswirlers:
+tgtplayer
+facetgt
+call makeswirler
+turn 2.0943951
+call makeswirler
+turn 2.0943951
+call makeswirler
+return
+
+flush:
+mov m 0
+flushtop:
+tgtplayer
+facetgt
+#randomize angle
+rnd temp
+mul temp .8
+sub temp .4
+turn temp
+tgtself
+spawntgt flusher.init
+#randomize the speed
+rnd temp
+mul temp .025
+add temp .006
+stv r1 temp __spawnid
+ifjmp m == 11 flushdone
+add m 1
+jmp flushtop
+flushdone:
+return
+
+makeswirler:
+moveface .1
+tgtself
+spawntgt swirler.init
+moveface -.1
+return
+

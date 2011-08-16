@@ -1,0 +1,19 @@
+decl bladespeed r1
+decl stop r0
+init:
+loop1:
+ifjmp stop == 1 mainloopinit
+update
+halt
+jmp loop1
+mainloopinit:
+mov __rotvel r1
+mov __userad 1
+mov __towardvel 0
+mov __velx 0
+mainloop:
+tgtparent
+update
+halt
+jmp mainloop
+

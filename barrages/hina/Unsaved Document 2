@@ -1,0 +1,21 @@
+
+routine:            #High level, visible everywhere
+
+#Some code...
+
+#Asm equivalent of    for i in range(0,10):
+
+set i 0
+
+.top:               #Low level, only of interest locally
+                    #Assembles to routine.top
+#stuff
+
+sub i 1
+ifjmp i == 0 top
+
+
+
+
+
+

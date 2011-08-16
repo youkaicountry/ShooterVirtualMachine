@@ -1,0 +1,18 @@
+each piece of code will have:
+variablename -> register#
+code
+label -> codeloc
+
+step 1:
+open initial file, follow imports, get all files ready for load.
+
+step 2:
+expand special commands to real instructions
+
+step 3:
+rename labels to filename.label
+
+step 4:
+attach variable names and timer names
+
+

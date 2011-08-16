@@ -1,0 +1,13 @@
+init:
+#mov __velx 1
+decl deathtimer r8
+setjmptimer deathtimer 60 die
+loop:
+inctimer deathtimer
+moveface 1
+halt
+#update
+jmp loop
+die:
+terminate
+

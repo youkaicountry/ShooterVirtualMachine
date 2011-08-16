@@ -1,0 +1,27 @@
+import circle.ssc
+
+init:
+addfrcfac .9
+addacc 0 .01
+mov timereset 10
+mov timer timereset
+
+loopy:
+update
+tgtself
+call spawner
+halt 1
+jmp loopy
+
+spawner:
+sub timer 1
+mov t timer
+leq t 0
+if t
+cndcall subby
+return 0
+
+subby:
+mov timer timereset
+spawnchild circle
+return 0

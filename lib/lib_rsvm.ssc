@@ -1,0 +1,118 @@
+update:
+push r0 #temp variable
+push r1
+push r2
+push r3
+push r4
+push r5
+push r6
+
+#x and y
+add __velx __accx
+add __vely __accy
+add __x __velx
+add __y __vely
+
+#thrust
+add __thrustvel __thrustacc
+cos r0 __angle
+mul r0 __thrustvel
+add __x r0
+sin r0 __angle
+mul r0 __thrustvel
+add __y r0 
+
+#turn physics
+add __turnvel __turnacc
+add __angle __turnvel
+
+#rotation
+add __rotvel __rotacc
+add __towardvel __towardacc
+sub r0 __x __targetx
+sub r1 __y __targety
+mul r0 r0
+mul r1 r1
+add r0 r1
+sqrt r2 r0                           #now r2 is the radius
+mov r3 __rotvel                       #r3 is theta
+cmp __condition __userad == 1.0
+cndjmp update.next
+div r3 r2      #radius correction (since not using radians)
+.next:
+cos r4 r3 #r4 is cost
+sin r3 r3 #r3 is sint
+sub r0 __x __targetx  #r0 = vx
+sub r1 __y __targety  #r1 = vy
+mul r5 r4 r0  #vx * cost
+mul r6 r3 r1  #vy * sint
+sub r5 r6 #r5 is dx
+add __x __targetx r5   
+mul r5 r3 r0  #vx * sint
+mul r6 r4 r1  #vy * cast
+add r5 r6 #r5 is dx
+add __y __targety r5
+div r2 1.0 r2 #1 / radius   r2 is dtor
+mul r0 __towardvel
+mul r0 r2
+add __x __x r0
+mul r1 __towardvel
+mul r1 r2
+add __y __y r1
+
+pop r6
+pop r5
+pop r4
+pop r3
+pop r2 
+pop r1
+pop r0
+return
+
+tgtself:
+mov __targetx __x
+mov __targety __y
+return
+
+tgtparent:
+cmp __condition __parentid >= 0
+cndjmp tgtparent.next
+return
+.next:
+gtv __targetx __x __parentid
+gtv __targety __y __parentid
+return
+
+tgtplayer:
+mov __targetx __playerx
+mov __targety __playery
+return
+
+tgt:
+pop __targety
+pop __targetx
+return
+
+movechildren: #r0 = id, r1 = xamount, r2 = yamount, uses r3
+push r3
+gtv r3 __numchildren r0
+.loop:
+sub r3 1
+cmp __condition r3 < 0
+cndjmp movechildren.out
+push r0
+cid r0 r3 r0
+push m1
+gtv m1 __x r0
+add m1 r1
+stv __x m1 r0
+gtv m1 __y r0
+add m1 r2
+stv __y m1 r0
+pop m1
+pop r0
+jmp movechildren.loop
+.out:
+pop r3
+return
+

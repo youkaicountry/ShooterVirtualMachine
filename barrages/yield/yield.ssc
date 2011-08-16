@@ -1,0 +1,22 @@
+import child.ssc
+acceptmsg 2
+acceptmsg 3
+
+init:
+
+start:
+
+spawntgt child.init
+
+loop:
+send 1 0 __spawnid
+recvwait 2 r0 r1 r0
+ifjmp r1 == -1 done
+trace 1
+recvwait 3 r0 r26 r0
+trace 0
+jmp loop
+
+done:
+halt
+terminate

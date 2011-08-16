@@ -1,0 +1,56 @@
+import straight.ssc
+
+decl straightspawntimer r0
+decl rotsinmult r1
+decl rotsinadd r2
+decl towsinmult r3
+decl towsinadd r4
+decl i r5
+decl j r6
+
+
+#add changes how quickly it moves
+#mult changes how far it goes before turning around
+init:
+mov __radius .03
+mov __sprite 0
+setcalltimer straightspawntimer 16 makestraight 
+mov __userad 1
+mov rotsinmult .04
+mov rotsinadd .02
+mov towsinmult .007
+mov towsinadd .05
+mov i 0
+mov j 0
+
+loop:
+inctimer straightspawntimer
+push i
+sin i i
+mul i i rotsinmult
+mov __rotvel i #setvelrot
+pop i
+add i i rotsinadd
+
+push j
+sin j j
+mul j j towsinmult
+mul j j 1
+mov __towardvel j #setvelrot
+pop j
+add j j towsinadd
+
+
+tgtparent
+update
+halt
+jmp loop
+
+makestraight:
+tgtparent
+facetgt
+turn 3.14159
+tgtself
+spawntgt straight.init
+return
+

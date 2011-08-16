@@ -1,0 +1,15 @@
+decl deathtimer r0
+
+init:
+setjmptimer deathtimer 300 die
+addfacevel 3
+
+loop:
+inctimer deathtimer
+update
+halt
+jmp loop
+
+die:
+terminate
+

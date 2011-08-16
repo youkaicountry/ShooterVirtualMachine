@@ -1,0 +1,33 @@
+import scythecenter.ssc
+decl spawntimer r0
+decl width      r1
+decl temp       r8
+decl temp2      r9
+
+init:
+   setcalltimer spawntimer 50 makescythecenter
+   mov width 480
+   
+loop:
+   inctimer spawntimer
+   halt
+   jmp loop
+   
+makescythecenter:
+   rnd temp
+   mul temp width
+   push __x
+   push __y
+   add __y 20
+   mov __x temp
+   tgtself
+   spawntgt scythecenter.init
+   rnd temp
+   mul temp 10
+   add temp 9
+   stv r0 temp __spawnid
+   stv r1 .035 __spawnid
+   pop __y
+   pop __x
+   return
+   

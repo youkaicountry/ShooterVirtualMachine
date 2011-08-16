@@ -1,0 +1,15 @@
+init:
+decl deathtimer r0
+setjmptimer deathtimer 300 die
+#addvelfac 12
+
+loop:
+inctimer deathtimer
+moveface 1
+#update
+halt
+jmp loop
+
+die:
+terminate
+

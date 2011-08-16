@@ -1,0 +1,37 @@
+
+import straight.ssc
+
+init:
+mov spread 0
+mov x 0
+mov n 0
+
+loop:
+turn 0.25
+call line
+add spread spread 0.001
+halt 1
+jmp loop
+
+line:
+mov n 4
+push __x
+push __y
+lineloop:
+movefac 10.0
+
+rnd x
+add x x x
+mul x x spread
+sub x x spread
+push __angle
+turn x
+tgtself
+spawnchild straight
+pop __angle
+sub n n 1
+ifjmp n != 0 lineloop
+pop __y
+pop __x
+return
+

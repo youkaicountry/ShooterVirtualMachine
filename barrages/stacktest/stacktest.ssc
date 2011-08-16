@@ -1,0 +1,17 @@
+init:
+halt 2
+push 5
+push 6
+push 7
+pop r1
+peek r2
+peekat r3 1
+pokeat 15 1
+sat r8 2 200
+gat r0 r12 -2
+gof r1 r8 1 
+
+loop:
+halt 2
+jmp loop
+

@@ -1,5 +1,5 @@
 from . import RSVM as RSVMmod
-from . import compiler as compilermod
+from . import ocompiler as compilermod
 from . import fcode as fcodemod
 from . import intermediate as intermediatemod
 from . import assembly as assemblymod

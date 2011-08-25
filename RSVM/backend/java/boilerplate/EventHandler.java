@@ -1,4 +1,3 @@
-
 /**
  *
  * An EventHandler receives events from other VM threads or from the system.
@@ -18,3 +17,4 @@ public interface EventHandler
 {
     public void handleEvent(int channel, float sender, float type, float data);
 }
+

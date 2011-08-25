@@ -1,4 +1,3 @@
-
 public class FloatQueue
 {
    float buffer[];

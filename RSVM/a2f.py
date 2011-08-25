@@ -267,7 +267,8 @@ def __a2f_gof(params):
     offset = __getVal(params[2])
     return __makeInst(72.0, (tgt, var, offset))
 
-
+def __a2f_xupdate(params):
+    return __makeInst(256.0, ())
 
 op2func = {}
 op2func["halt"] = __a2f_halt
@@ -310,4 +311,6 @@ op2func["pokeat"] = __a2f_pokeat
 op2func["sat"] = __a2f_sat
 op2func["gat"] = __a2f_gat
 op2func["gof"] = __a2f_gof
+
+op2func["xupdate"] = __a2f_xupdate
 

@@ -22,7 +22,7 @@ def loadHigh(directory, filename, lib=("./lib/","lib_rsvm.ssc")):
    files = [[directory, filename]]
    filestoload = [[directory, filename]]
    namespaces = [""]
-   for x in xrange(0,len(lib),2):
+   for x in range(0,len(lib),2):
       files.append([lib[x], lib[x+1]])
       filestoload.append([lib[x], lib[x+1]])
       namespaces.append("")

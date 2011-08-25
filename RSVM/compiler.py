@@ -1,10 +1,8 @@
-import h2a
-import a2f
-import f2p
-import fcode
-import high
-import f2j
-import f2i
+from . import h2a
+from . import a2f
+from . import fcode
+from . import high
+from . import f2i
 
 def compileHighFileToAssemblyList(directory, filename):
    h = high.loadHigh(directory, filename)

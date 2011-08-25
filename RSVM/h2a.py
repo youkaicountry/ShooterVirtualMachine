@@ -43,7 +43,7 @@ statevars["__stackloc"] = "t9"
 statevars["__playerx"] = "v0"
 statevars["__playery"] = "v1"
 
-import high
+from . import high
 
 def high2assembly(highcode, startname):
    middic = copy.deepcopy(highcode)
@@ -53,7 +53,7 @@ def high2assembly(highcode, startname):
    #0. expand dotted labels
    for x in middic.keys():
       lastnormal = ""
-      for linenum in xrange(len(middic[x]["code"])):
+      for linenum in range(len(middic[x]["code"])):
          if len(middic[x]["code"][linenum].split(":")) > 1:
             if middic[x]["code"][linenum].split(".")[0] == "":
                middic[x]["code"][linenum] = lastnormal + middic[x]["code"][linenum]
@@ -71,7 +71,7 @@ def high2assembly(highcode, startname):
             
    for x in middic.keys():
       newcode = []
-      for linenum in xrange(len(middic[x]["code"])):
+      for linenum in range(len(middic[x]["code"])):
          if middic[x]["code"][linenum].split()[0] != "decl":
             newcode.append(middic[x]["code"][linenum])
       middic[x]["code"] = newcode
@@ -89,7 +89,7 @@ def high2assembly(highcode, startname):
    halts = {}
    for x in middic.keys():
       halts[x] = []
-      for linenum in xrange(len(middic[x]["code"])):
+      for linenum in range(len(middic[x]["code"])):
          if middic[x]["code"][linenum].split()[0] == "halt": halts[x].append(linenum)
    
    for x in middic.keys():
@@ -153,7 +153,7 @@ def high2assembly(highcode, startname):
    
    #3. set variable names
    for x in middic.keys():
-      for linenum in xrange(len(middic[x]["code"])):
+      for linenum in range(len(middic[x]["code"])):
          newline = middic[x]["code"][linenum]
          linep = newline.split()
          outline = linep[0]
@@ -185,12 +185,12 @@ def high2assembly(highcode, startname):
    #5a. rename labels
    for x in middic.keys():
       templabels = set()
-      for linenum in xrange(len(middic[x]["code"])):
+      for linenum in range(len(middic[x]["code"])):
          if len(middic[x]["code"][linenum].split(":")) > 1:
             templabels.add(middic[x]["code"][linenum][:-1])
             middic[x]["code"][linenum] = x + "." + middic[x]["code"][linenum]
       #5b. rename reference to the labels
-      for linenum in xrange(len(middic[x]["code"])):
+      for linenum in range(len(middic[x]["code"])):
          newline = middic[x]["code"][linenum]
          linep = newline.split()
          outline = linep[0]
@@ -207,7 +207,7 @@ def high2assembly(highcode, startname):
    for x in middic.keys():
       newinst = []
       middic[x]["labels"] = {}
-      for linenum in xrange(len(middic[x]["code"])):
+      for linenum in range(len(middic[x]["code"])):
          if len(middic[x]["code"][linenum].split(":")) > 1:
             middic[x]["labels"][middic[x]["code"][linenum].split(":")[0]] = len(newinst)
          else:
@@ -230,7 +230,7 @@ def high2assembly(highcode, startname):
       labeladd = len(allcode)
    
    #9. Change labels
-   for linenum in xrange(len(allcode)):
+   for linenum in range(len(allcode)):
       newline = allcode[linenum]
       linep = newline.split()
       outline = linep[0]

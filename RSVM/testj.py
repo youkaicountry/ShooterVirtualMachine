@@ -196,6 +196,16 @@ code = [None, [a]]
 import rsvmcompiler
 from rsvmcompiler.modules import FCode2Java
 from rsvmcompiler.modules import FASM2FCode
+from rsvmcompiler.languages import java
 
-fcode = FASM2FCode.doCompile(code)
-print(fcode)
+class fasm2javaChain(rsvmcompiler.CompilerChain):
+    def __init__(self):
+        rsvmcompiler.CompilerChain.__init__(self, (FCode2Java, FASM2FCode))
+        return
+
+com = fasm2javaChain()
+print(com.graph.getVertexList())
+
+#for l in gen["gen.java"]:
+#    print(l)
+    

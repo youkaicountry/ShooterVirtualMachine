@@ -1,8 +1,10 @@
-graph_info = [None, None, 1] #from, to
+from rsvmcompiler.languages import fcode
+from rsvmcompiler.languages import java
+
+graph_info = [fcode, java, 1] #from, to
 
 def doCompile(code):
     f = code[1][0]
-    print(f)
     instructions = len(f) / 9   #the number of instructions in the program
     startpoints = []
     endpoints = []
@@ -73,8 +75,7 @@ def doCompile(code):
         pcode[i].append("    }")
         pcode[i].append("    ")
     
-    print(pcode)
-    return
+    return (None, pcode[2:])
 
 import re
 

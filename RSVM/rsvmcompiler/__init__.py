@@ -1,5 +1,8 @@
 from . import modules
 from . import languages
+import YoukaiTools
+from YoukaiTools import GraphEngine
+    
 
 #compilers have the proper languages loaded, so the host program simply
 #loads the set of compilers, and this chain will build a graph of how
@@ -15,5 +18,16 @@ class CompilerChain:
         return
     
     def __buildGraph(self):
+        g = GraphEngine.BasicGraph()
+        for comp in self.compilers:
+            for lang in comp.graph_info[:2]:
+                if not g.containsVertex(lang):
+                    g.addVertex(lang)
+        
+        for comp in self.compilers:
+            g.addEdge(comp.graph_info[0], comp.graph_info[1], True, comp)
+            g.setEdgeData(comp, "cost", comp.graph_info[2])
+        
+        self.graph = g
         return
     

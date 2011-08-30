@@ -1,4 +1,7 @@
-graph_info = [None, None, 1] #from, to
+from rsvmcompiler.languages import fasm
+from rsvmcompiler.languages import fcode
+
+graph_info = [fasm, fcode, 1] #from, to
 
 def doCompile(code):
     high = code[1][0]

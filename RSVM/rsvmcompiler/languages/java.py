@@ -1,15 +1,43 @@
-def constructOutputFiles(code):
-    return {}
+def constructOutputFiles(code, fname="gen.java"):
+    bp = __getBoilerPlateFiles()
+    gen = __constructMainFile(code, fname)
+    return bp.update(gen)
+
+def fromString(string):
+    return None
 
 def optimize(code, options={}):
     return
 
-def __constructMainFile():
-    return
+def __constructMainFile(code, fname):
+    ucode = code[1]
+    outdic={}
+    ent=[]
+    #append the first part of the boilerplate code
+    ent += bp_1
+    
+    #append the switch statement code
+    for i in range(len(ucode)):
+        ent.append("           case "+str(i)+": retval = this.f"+str(i)+"(th); break;")
+    
+    #append the second part of the boilerplate code
+    ent += bp_2
+    
+    #append the generated code
+    for i, block in enumerate(ucode):
+        ent.append("    private int f"+str(i)+"(ShooterThread sthread)")
+        ent.append("    {")
+        ent += block
+    
+    outdic[fname] = ent
+    return outdic
 
 def __getBoilerPlateFiles():
     return {"EventHandler.java":bp_EventHandler, "FloatQueue.java":bp_FloatQueue, "IntQueue.java":bp_IntQueue, "ShooterThread.java":bp_ShooterThread, "ShooterVirtualMachine.java":bp_ShooterVirtualMachine}
-   
+
+def __repr__():
+    return "java"
+
 bp_EventHandler='/**\n\
  *\n\
  * An EventHandler receives events from other VM threads or from the system.\n\
@@ -215,4 +243,297 @@ interface ShooterVirtualMachine\n\
     void run();\n\
 }'.split("\n")
 
+bp_1='import java.util.ArrayList;\n\
+import java.util.Hashtable;\n\
+import java.util.Iterator;\n\
+import java.util.Map;\n\
+import java.util.Random;\n\
+import java.util.Set;\n\
+import java.util.Stack;\n\
+import java.util.TreeMap;\n\
+\n\
+@SuppressWarnings("all")\n\
+class RSVM implements ShooterVirtualMachine\n\
+   {\n\
+    public Hashtable<Integer, ShooterThread> threads;\n\
+    public Hashtable<String, Integer> statename;\n\
+    public float[] mem;\n\
+    public Random r = null;\n\
+    public float[] vmdata = new float[2];\n\
+    public int regsize;\n\
+    public int stacksize;\n\
+    public int nextthread;\n\
+    private float tf1, tf2, tf3;\n\
+    private int ti1, ti2;\n\
+    private Stack<ShooterThread> ready_threads;\n\
+    \n\
+    //try 64, 32, 32, 32, null\n\
+    //if r is null, a new one is made.\n\
+    public RSVM(int memsize, int regsize, int stacksize, int initthreads, Random r)\n\
+    {\n\
+        if (r == null) {this.r = new Random();}\n\
+        this.ready_threads = new Stack<ShooterThread>();\n\
+        for (int i = 0; i < initthreads; i++)\n\
+        {\n\
+            this.ready_threads.push(new ShooterThread(0, regsize, stacksize));\n\
+        }\n\
+        this.threads = new Hashtable<Integer, ShooterThread>();\n\
+        this.mem = new float[memsize];\n\
+        this.regsize = regsize;\n\
+        this.stacksize = stacksize;\n\
+        this.nextthread = 0;\n\
+        this.mem[0] = 0;\n\
+        this.mem[1] = 0;\n\
+        this.statename = new Hashtable<String, Integer>();\n\
+        statename.put("x", new Integer(0));\n\
+        statename.put("__x", new Integer(0));\n\
+        statename.put("y", new Integer(1));\n\
+        statename.put("__y", new Integer(1));\n\
+        statename.put("angle", new Integer(2));\n\
+        statename.put("__angle", new Integer(2));\n\
+        statename.put("targetx", new Integer(3));\n\
+        statename.put("__targetx", new Integer(3));\n\
+        statename.put("targety", new Integer(4));\n\
+        statename.put("__targety", new Integer(4));\n\
+        statename.put("returnval", new Integer(5));\n\
+        statename.put("__returnval", new Integer(5));\n\
+        statename.put("condition", new Integer(6));\n\
+        statename.put("__condition", new Integer(6));\n\
+        statename.put("sprite", new Integer(27));\n\
+        statename.put("__sprite", new Integer(27));\n\
+        statename.put("radius", new Integer(28));\n\
+        statename.put("__radius", new Integer(28));\n\
+        return;\n\
+    }\n\
+    \n\
+    private int block2FuncCall(ShooterThread th)\n\
+    {\n\
+        int retval = 0;\n\
+        switch (th.codeloc)\n\
+        {'.split("\n")
 
+bp_2='}\n\
+        return retval;\n\
+    }\n\
+    \n\
+    public int spawnThread(int initloc, float x, float y, float angle, int parent)\n\
+    {\n\
+        int nt = this.nextthread;\n\
+        ShooterThread st;\n\
+        if (this.ready_threads.empty())\n\
+        {\n\
+            st = new ShooterThread(initloc, this.regsize, this.stacksize);\n\
+        }\n\
+        else\n\
+        {\n\
+            st = (ShooterThread)(this.ready_threads.pop());\n\
+            st.clear(initloc);\n\
+        }\n\
+        this.threads.put(nt, st);\n\
+        st.state[0] = x;\n\
+        st.state[1] = y;\n\
+        st.state[2] = angle;\n\
+        st.threadvars[1] = nt;\n\
+        if (parent >= 0)\n\
+        {\n\
+            st.threadvars[0] = parent;\n\
+            this.threads.get(parent).children.add(this.threads.get(parent).children.size(), nt);\n\
+        }\n\
+        else\n\
+        {\n\
+            st.threadvars[0] = -1;\n\
+        }\n\
+        this.nextthread++;\n\
+        this.scheduled_threads.write(nt);\n\
+        return nt;\n\
+    }\n\
+    \n\
+    public void setPlayerPosition(float x, float y)\n\
+    {\n\
+        this.vmdata[0] = x;\n\
+        this.vmdata[1] = y;\n\
+        return;\n\
+    }\n\
+    \n\
+    public int getThreadParent(int threadid)\n\
+    {\n\
+        return (int)(this.threads.get(threadid).threadvars[0]);\n\
+    }\n\
+    \n\
+    public ArrayList<Integer> getThreadChildren(int threadid)\n\
+    {\n\
+        return this.threads.get(threadid).children;\n\
+    }\n\
+    \n\
+    public float getState(int threadid, String state)\n\
+    {\n\
+        return this.threads.get(threadid).state[this.statename.get(state)];\n\
+    }\n\
+    \n\
+    public Iterator<Integer> getThreadIDs()\n\
+    {\n\
+        //int[] retval = new int[this.threads.size()];\n\
+        Set<Integer> s = this.threads.keySet();\n\
+        return s.iterator();\n\
+    }\n\
+    \n\
+    private IntQueue scheduled_threads = new IntQueue();\n\
+    \n\
+    public void run()\n\
+    {\n\
+        Iterator<Integer> it = this.getThreadIDs();\n\
+        while(it.hasNext())\n\
+        {\n\
+           int tid = it.next();\n\
+        	 ShooterThread th = threads.get(tid);\n\
+        	 if (!th.msg_isWaitingForMessage)\n\
+        	    scheduled_threads.write(tid);\n\
+        }\n\
+        while(true)\n\
+        {\n\
+            int tid = scheduled_threads.read();\n\
+            if (tid == IntQueue.NO_SUCH_ELEMENT)\n\
+               break;\n\
+            ShooterThread ct = this.threads.get(tid);\n\
+            while (ct.sleep <= 0)\n\
+            {\n\
+                if (ct.msg_isWaitingForMessage)\n\
+                   break;\n\
+                ct.codeloc = this.block2FuncCall(ct);\n\
+            }\n\
+            ct.sleep -= 1;\n\
+        }\n\
+        return;\n\
+    }\n\
+   \n\
+   private boolean recvwait(ShooterThread th, float msgtype)\n\
+   {\n\
+      if (!getMessage(th, msgtype))\n\
+      {\n\
+         th.msg_isWaitingForMessage = true;\n\
+         return false;\n\
+      }\n\
+      th.msg_isWaitingForMessage = false;\n\
+      return true;\n\
+   }\n\
+   \n\
+   /**\n\
+    * Send a message to the given thread from the given sending thread.\n\
+    *\n\
+    * This method is safe to call in instructions executed during run()\n\
+    * and is also safe to call outside of run() to generate external events.\n\
+    * If th_sender is null then a sending thread ID of -1 will be passed.\n\
+    */\n\
+   public void sendMessage(float msgtype, float msgdata, ShooterThread th_sender, float id_target)\n\
+   {\n\
+      float id_sender = (th_sender == null) ? -1 : (float) th_sender.threadvars[1];\n\
+      ShooterThread th_target = threads.get((int) id_target);\n\
+      sendMessageImpl(msgtype, msgdata, id_sender, th_target);\n\
+      if (!th_target.msg_isWaitingForMessage)\n\
+         return;\n\
+      scheduled_threads.write((int) th_target.threadvars[1]);\n\
+      th_target.msg_isWaitingForMessage = false;\n\
+      return;\n\
+   }\n\
+   \n\
+   private void sendMessageImpl(float msgtype, float msgdata, float id_sender, ShooterThread th_target)\n\
+   {\n\
+      Map<Integer, FloatQueue> m = th_target.msg_queue_map;\n\
+      FloatQueue q;\n\
+      if (m != null)\n\
+      {\n\
+         q = m.get((int) msgtype);\n\
+         if (q == null)\n\
+            return;    // silently discard unexpected messages for threads using message declarations\n\
+      }\n\
+      else\n\
+         q = th_target.msg_queue_all;\n\
+      q.write(msgtype);\n\
+      q.write(msgdata);\n\
+      q.write(id_sender);\n\
+      return;\n\
+   }\n\
+   \n\
+   public void declareMessage(ShooterThread th, float msgtype)\n\
+   {\n\
+       if (th.msg_queue_map == null)\n\
+          th.msg_queue_map = new TreeMap<Integer, FloatQueue>();\n\
+       int i = (int) msgtype;\n\
+       if (th.msg_queue_map.containsKey(i))\n\
+          return;\n\
+       FloatQueue q = new FloatQueue();\n\
+       th.msg_queue_map.put(i, q);\n\
+       separateMessages(th.msg_queue_all, q, (float) i);\n\
+       return;\n\
+   }\n\
+   \n\
+   public static void separateMessages(FloatQueue src, FloatQueue dest, float msgtype)\n\
+   {\n\
+      // Move all messages of given type from src to dest.\n\
+      int n = src.length();\n\
+      if ((n%3) != 0)\n\
+         throw(new IllegalStateException("Message queue length not divisible by 3"));\n\
+      for(int i=0;i<n;i+=3)\n\
+      {\n\
+         float itype    = src.read();\n\
+         float idata    = src.read();\n\
+         float isender  = src.read();\n\
+         FloatQueue q = (itype == msgtype) ? dest : src;\n\
+         q.write(itype);\n\
+         q.write(idata);\n\
+         q.write(isender);\n\
+      }\n\
+      return;\n\
+   }\n\
+   \n\
+   public boolean getMessage(ShooterThread th, float msgtype)\n\
+   {\n\
+      if (th.msg_queue_map == null)\n\
+      {\n\
+         FloatQueue q = th.msg_queue_all;\n\
+         if (q.isEmpty())\n\
+            return false;\n\
+         if (msgtype == -1)\n\
+         {\n\
+            this.tf1 = q.read();\n\
+            this.tf2 = q.read();\n\
+            this.tf3 = q.read();\n\
+            return true;\n\
+         }\n\
+         throw(new IllegalStateException("If you want to filter messages, use message declarations!"));\n\
+         // to implement this, you would pull messages from q until done or you get a message of the correct type\n\
+         // then put the irrelevant messages back\n\
+      }\n\
+      if (msgtype == -1)\n\
+      {\n\
+         for(FloatQueue q : th.msg_queue_map.values())\n\
+         {\n\
+            if (!q.isEmpty())\n\
+            {\n\
+               this.tf1 = q.read();\n\
+               this.tf2 = q.read();\n\
+               this.tf3 = q.read();\n\
+               return true;\n\
+            }\n\
+         }\n\
+         return false;\n\
+      }\n\
+      FloatQueue q = th.msg_queue_map.get((int) msgtype);\n\
+      if ((q == null) || (q.isEmpty()))\n\
+         return false;\n\
+      this.tf1 = q.read();\n\
+      this.tf2 = q.read();\n\
+      this.tf3 = q.read();\n\
+      return true;\n\
+   }\n\
+   \n\
+   public static String showFloat(float f)\n\
+   {\n\
+      int i = (int) f;\n\
+      return (f == (float) i) ? ""+i : ""+f;\n\
+   }\n\
+   \n\
+   public boolean isDone()\n\
+   {\n\
+      return (this.threads.size() == 0);\n\
+   }'.split("\n")

@@ -1,123 +1,123 @@
-# from rsvmcompiler.languages import fcode
-# from rsvmcompiler.languages import java
-# 
-# graph_info = [fcode, java, 1] #from, to
-# 
-# def doCompile(code):
-    # f = code[1][0]
-    # instructions = len(f) / 9   #the number of instructions in the program
-    # startpoints = []
-    # endpoints = []
-    # blocks = []
-    # lineinfo = []
-    # 
-    # for i in range(int(instructions)):
-       # lineinfo.append([False, False, -1])
-    # 
-    # for i in range(0, len(f), 9):  #loop through the instructions
-        # if i > 0: #if this is not the first line
-            # if f[i-9] in [1.0, 19.0, 27.0, 3.0]:
-                # lineinfo[int(i/9)][0] = True  #last line was: halt call cndcall terminate
-        # else:
-            # lineinfo[0][0] = True   #is the first line
-        # if f[i] == 4.0 or f[i] == 19.0 or f[i] == 27.0:  #is a jmp/call/cndcall
-            # lineinfo[int(f[i+2])][0] = True  #the location pointed to is a start point
-            # lineinfo[int(i/9)][1] = True #this location is an end point
-        # if f[i] == 26.0 or f[i] == 31.0: #this is a cndjmp or a spawn
-            # lineinfo[int(f[i+2])][0] = True  #the location pointed to is a start point
-        # if f[i] == 20.0 or f[i] == 1.0: #line is a return or halt
-            # lineinfo[int(i/9)][1] = True
-        # if f[i] == 50.0:   #line is a recvwait line
-            # lineinfo[int(i/9)][0] = True
-        # #n.b., the line OF a recvwait is the start of a block because
-        # #   a recvwait is essentially a conditional jump to itself
-# 
-    # #mark the lines before start lines
-    # for i in range(int(instructions)):
-        # if i > 0:  #if this is not the first line
-            # if lineinfo[i][0]:  #if this line is a start line
-                # lineinfo[i-1][1] = True  #mark the last line as an end line
-# 
-    # #assign blocks to each instruction
-    # running = False
-    # blocknum = -1
-    # for i in range(int(instructions)):
-        # if lineinfo[i][0]:
-            # running = True
-            # blocknum += 1
-        # if running:
-            # lineinfo[i][2] = blocknum
-        # if lineinfo[i][1]:
-            # running = False
-    # 
-    # pcode = []
-    # pcode.append([]) #0 - top
-    # pcode.append([]) #0 - top
-    # print(blocknum)
-    # for x in range(blocknum+1):
-        # pcode.append([])
-    # for inst in range(int(instructions)):
-      # floc = inst*9
-      # if lineinfo[inst][2] != -1:
-         # blockindex = lineinfo[inst][2] + 2
-         # if f[floc] in traceInstructions:
-             # pcode[blockindex] += __createPreTraceCode(f[floc:floc+9], 2, lineinfo[inst][2], lineinfo, inst)
-         # pcode[blockindex] = pcode[blockindex] + op2func[f[floc]](f[floc:floc+9], 2, lineinfo[inst][2], lineinfo, inst)
-         # if f[floc] in traceInstructions:
-             # pcode[blockindex] += __createPostTraceCode(f[floc:floc+9], 2, lineinfo[inst][2], lineinfo, inst)
-         # #print pcode[blockindex]
-# 
-   # #return the next block if it has not been done
-    # for i in range(2,len(pcode)):
-        # if pcode[i][-1].strip().split()[0] != "return":
-            # pcode[i].append("      return this.f"+str((i-2)+1)+"(sthread);")
-        # #add the ending brace
-        # pcode[i].append("    }")
-        # pcode[i].append("    ")
-    # 
-    # return (None, pcode[2:])
-# 
-# import re
-# 
-# code2sign = {}
-# code2sign[0.0] = "=="
-# code2sign[1.0] = "<"
-# code2sign[2.0] = ">"
-# code2sign[3.0] = ">="
-# code2sign[4.0] = "<="
-# code2sign[5.0] = "!="
-# 
-# #OPTIONS
-# debug = True
-# optimize = True
-# traceInstructions = set([50.0, 51.0, 52.0, 53.0])
-# fulltrace = False
-# 
-# #compile the regular expressions
-# re_reg = re.compile(r"sthread[.]registers[\[]([0-9]+)[\]]")
-# re_state = re.compile(r"sthread[.]state[\[]([0-9]+)[\]]")
-# re_mem = re.compile(r"this[.]mem[\[]([0-9]+)[\]]")
-# re_vm = re.compile(r"this[.]vmdata[\[]([0-9]+)[\]]")
-# re_tv = re.compile(r"sthread[.]threadvars[\[]([0-9]+)[\]]")
-# re_ret = re.compile(r"return")
-# 
-# def __getVal(v1, v2, owner):
-   # if v1 == 0.0:
-      # return owner+".registers["+str(int(v2))+"]"
-   # if v1 == 1.0:
-      # return str(v2)+"f"
-   # if v1 == 2.0:
-      # return owner+".state["+str(int(v2))+"]"
-   # if v1 == 3.0:
-      # return "this.mem["+str(int(v2))+"]"
-   # if v1 == 4.0:
-      # return "this.vmdata["+str(int(v2))+"]"
-   # if v1 == 7.0:
-      # if v2 == 5.0:
-         # return owner+".children.size()"
-      # return owner+".threadvars["+str(int(v2))+"]"
-   # return "0"
-# 
+from rsvmcompiler.languages import fcode
+from rsvmcompiler.languages import rin
+
+graph_info = [fcode, rin, 1] #from, to
+
+def doCompile(code):
+    f = code[1][0]
+    instructions = len(f) / 9   #the number of instructions in the program
+    startpoints = []
+    endpoints = []
+    blocks = []
+    lineinfo = []
+    
+    for i in range(int(instructions)):
+        lineinfo.append([False, False, -1])
+    
+    for i in range(0, len(f), 9):  #loop through the instructions
+        if i > 0: #if this is not the first line
+            if f[i-9] in [1.0, 19.0, 27.0, 3.0]:
+                lineinfo[int(i/9)][0] = True  #last line was: halt call cndcall terminate
+        else:
+            lineinfo[0][0] = True   #is the first line
+        if f[i] == 4.0 or f[i] == 19.0 or f[i] == 27.0:  #is a jmp/call/cndcall
+            lineinfo[int(f[i+2])][0] = True  #the location pointed to is a start point
+            lineinfo[int(i/9)][1] = True #this location is an end point
+        if f[i] == 26.0 or f[i] == 31.0: #this is a cndjmp or a spawn
+            lineinfo[int(f[i+2])][0] = True  #the location pointed to is a start point
+        if f[i] == 20.0 or f[i] == 1.0: #line is a return or halt
+            lineinfo[int(i/9)][1] = True
+        if f[i] == 50.0:   #line is a recvwait line
+            lineinfo[int(i/9)][0] = True
+        #n.b., the line OF a recvwait is the start of a block because
+        #   a recvwait is essentially a conditional jump to itself
+
+    #mark the lines before start lines
+    for i in range(int(instructions)):
+        if i > 0:  #if this is not the first line
+            if lineinfo[i][0]:  #if this line is a start line
+                lineinfo[i-1][1] = True  #mark the last line as an end line
+
+    #assign blocks to each instruction
+    running = False
+    blocknum = -1
+    for i in range(int(instructions)):
+        if lineinfo[i][0]:
+            running = True
+            blocknum += 1
+        if running:
+            lineinfo[i][2] = blocknum
+        if lineinfo[i][1]:
+            running = False
+    
+    pcode = []
+    pcode.append([]) #0 - top
+    pcode.append([]) #0 - top
+    print(blocknum)
+    for x in range(blocknum+1):
+        pcode.append([])
+    for inst in range(int(instructions)):
+      floc = inst*9
+      if lineinfo[inst][2] != -1:
+         blockindex = lineinfo[inst][2] + 2
+         if f[floc] in traceInstructions:
+             pcode[blockindex] += __createPreTraceCode(f[floc:floc+9], 2, lineinfo[inst][2], lineinfo, inst)
+         pcode[blockindex] = pcode[blockindex] + op2func[f[floc]](f[floc:floc+9], 2, lineinfo[inst][2], lineinfo, inst)
+         if f[floc] in traceInstructions:
+             pcode[blockindex] += __createPostTraceCode(f[floc:floc+9], 2, lineinfo[inst][2], lineinfo, inst)
+         #print pcode[blockindex]
+
+   #return the next block if it has not been done
+    for i in range(2,len(pcode)):
+        if pcode[i][-1].strip().split()[0] != "return":
+            pcode[i].append("      return f"+str((i-2)+1)+"(sthread)")
+        #add the ending brace
+        pcode[i].append("    }")
+        pcode[i].append("    ")
+    
+    return (None, pcode[2:])
+
+import re
+
+code2sign = {}
+code2sign[0.0] = "=="
+code2sign[1.0] = "<"
+code2sign[2.0] = ">"
+code2sign[3.0] = ">="
+code2sign[4.0] = "<="
+code2sign[5.0] = "!="
+
+#OPTIONS
+debug = True
+optimize = True
+traceInstructions = set([50.0, 51.0, 52.0, 53.0])
+fulltrace = False
+
+#compile the regular expressions
+re_reg = re.compile(r"sthread[.]registers[\[]([0-9]+)[\]]")
+re_state = re.compile(r"sthread[.]state[\[]([0-9]+)[\]]")
+re_mem = re.compile(r"this[.]mem[\[]([0-9]+)[\]]")
+re_vm = re.compile(r"this[.]vmdata[\[]([0-9]+)[\]]")
+re_tv = re.compile(r"sthread[.]threadvars[\[]([0-9]+)[\]]")
+re_ret = re.compile(r"return")
+
+def __getVal(v1, v2, owner):
+   if v1 == 0.0:
+      return owner+".registers["+str(int(v2))+"]"
+   if v1 == 1.0:
+      return str(v2)+"f"
+   if v1 == 2.0:
+      return owner+".state["+str(int(v2))+"]"
+   if v1 == 3.0:
+      return "this.mem["+str(int(v2))+"]"
+   if v1 == 4.0:
+      return "this.vmdata["+str(int(v2))+"]"
+   if v1 == 7.0:
+      if v2 == 5.0:
+         return owner+".children.size()"
+      return owner+".threadvars["+str(int(v2))+"]"
+   return "0"
+
 # def __getValBase(v1, v2, owner):
    # if v1 == 0.0:
       # return (owner+".registers[", str(int(v2)))

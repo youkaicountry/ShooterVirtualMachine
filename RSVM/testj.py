@@ -191,20 +191,22 @@ jmp 175\n\
 pop r3\n\
 return'.split("\n")
 
-code = [None, [a]]
-
 import rsvmcompiler
 from rsvmcompiler.modules import FCode2Java
 from rsvmcompiler.modules import FASM2FCode
 from rsvmcompiler.languages import java
+from rsvmcompiler.languages import fcode
+from rsvmcompiler.languages import fasm
 
-class fasm2javaChain(rsvmcompiler.CompilerChain):
-    def __init__(self):
-        rsvmcompiler.CompilerChain.__init__(self, (FCode2Java, FASM2FCode))
-        return
+code = [fasm, [a]]
 
-com = fasm2javaChain()
-print(com.graph.getVertexList())
+com = rsvmcompiler.CompilerChain([FCode2Java, FASM2FCode])
+outcode = com.doCompile(code, java)
+
+for l in outcode[1]:
+    for o in l:
+        print(o)
+#print(com.graph.getVertexList())
 
 #for l in gen["gen.java"]:
 #    print(l)

@@ -14,8 +14,13 @@ class CompilerChain:
         self.__buildGraph()
         return
     
-    def doCompile(self, code, from_lang, to_lang):
-        return
+    def doCompile(self, code, to_lang):
+        path = YoukaiTools.GraphEngine.GraphTools.Paths.dijkstraPaths(self.graph, code[0], to_lang, "cost")
+        curcode = code
+        for node in path:
+            if node[1] is not None:
+                curcode = node[1].doCompile(curcode)
+        return curcode
     
     def __buildGraph(self):
         g = GraphEngine.BasicGraph()

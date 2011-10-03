@@ -343,34 +343,30 @@ def __inst_pokeat(inst, tabwidth, blocknum, lineinfo, instnum):
 
 def __inst_sat(inst, tabwidth, blocknum, lineinfo, instnum):
     out = []
-    if debug: out.append("//sat")
-    bv = __getValBase(inst[1], inst[2],"sthread")
-    out.append(bv[0] + bv[1] + __getVal(inst[3], inst[4],"sthread") + "] = " + __getVal(inst[5], inst[6],"sthread"))
+    bv = __getValBase(inst[1], inst[2], "thread")
+    out.append(bv[0] + bv[1] + __getVal(inst[3], inst[4],"thread") + "] = " + __getVal(inst[5], inst[6],"thread"))
     out = __addTabWidth(out, tabwidth)
     out = __addSemi(out)
     return out
 
 def __inst_gat(inst, tabwidth, blocknum, lineinfo, instnum):
     out = []
-    if debug: out.append("//gat")
-    bv = __getValBase(inst[3], inst[4],"sthread")
-    out.append(__getVal(inst[1], inst[2],"sthread") + " = " + bv[0] + bv[1] + " + " + __getVal(inst[5], inst[6],"sthread"))
+    bv = __getValBase(inst[3], inst[4],"thread")
+    out.append(__getVal(inst[1], inst[2],"thread") + " = " + bv[0] + bv[1] + " + " + __getVal(inst[5], inst[6],"thread"))
     out = __addTabWidth(out, tabwidth)
-    out = __addSemi(out)
     return out
 
 def __inst_gof(inst, tabwidth, blocknum, lineinfo, instnum):
     out = []
-    if debug: out.append("//gof")
-    bv = __getValBase(inst[3], inst[4],"sthread")
-    out.append(__getVal(inst[1], inst[2],"sthread") + " = " + bv[1] + " + " + __getVal(inst[5], inst[6],"sthread"))
+    bv = __getValBase(inst[3], inst[4],"thread")
+    out.append(__getVal(inst[1], inst[2],"thread") + " = " + bv[1] + " + " + __getVal(inst[5], inst[6],"thread"))
     out = __addTabWidth(out, tabwidth)
-    out = __addSemi(out)
     return out
+
+#-----------------
 
 def __inst_recvwait(inst, tabwidth, blocknum, lineinfo, instnum):
     out = []
-    if debug: out.append("//recvwait")
     out.append("if (!this.recvwait(sthread, "+__getVal(inst[1],inst[2],"sthread")+"))")
     out.append("   {")
     out.append("      return "+str(blocknum)+";")

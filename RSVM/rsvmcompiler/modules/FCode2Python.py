@@ -101,32 +101,34 @@ re_vm = re.compile(r"this[.]vmdata[\[]([0-9]+)[\]]")
 re_tv = re.compile(r"sthread[.]threadvars[\[]([0-9]+)[\]]")
 re_ret = re.compile(r"return")
 
+#DONE
 def __getVal(v1, v2, owner):
    if v1 == 0.0:
       return owner+".registers["+str(int(v2))+"]"
    if v1 == 1.0:
-      return str(v2)+"f"
+      return str(v2)
    if v1 == 2.0:
       return owner+".state["+str(int(v2))+"]"
    if v1 == 3.0:
-      return "this.mem["+str(int(v2))+"]"
+      return "self.mem["+str(int(v2))+"]"
    if v1 == 4.0:
-      return "this.vmdata["+str(int(v2))+"]"
+      return "self.vmdata["+str(int(v2))+"]"
    if v1 == 7.0:
       if v2 == 5.0:
-         return owner+".children.size()"
+         return "len("+owner+".children)"
       return owner+".threadvars["+str(int(v2))+"]"
    return "0"
 
+#DONE
 def __getValBase(v1, v2, owner):
    if v1 == 0.0:
-      return (owner+".registers[", str(int(v2)))
+      return owner+".registers["+str(int(v2))
    if v1 == 2.0:
-      return (owner+".state[", str(int(v2)))
+      return owner+".state["+str(int(v2))
    if v1 == 3.0:
-      return ("this.mem[", str(int(v2)))
+      return "self.mem["+str(int(v2))
    if v1 == 4.0:
-      return ("this.vmdata[", str(int(v2)))
+      return "self.vmdata["+str(int(v2))
    if v1 == 7.0:
       #if v2 == 5.0:
       #   return owner+".children.size()"
@@ -134,234 +136,170 @@ def __getValBase(v1, v2, owner):
    return ("e", "e")
 
 def __addTabWidth(lines, tabwidth):
-   return [((" "*4)*tabwidth) + l for l in lines]
+   return [((" "*3)*tabwidth) + l for l in lines]
    #print lines
-   
-def __addSemi(lines):
-    return [l + ";" for l in lines]
 
 def __inst_halt(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//halt")
-   out.append("sthread.sleep = (int)("+__getVal(inst[1], inst[2], "sthread")+")")
+   out.append("thread.sleep = "+__getVal(inst[1], inst[2], "thread"))
    out.append("return "+str(blocknum+1))
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_mov(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//mov")
-   out.append(__getVal(inst[1], inst[2], "sthread")+" = "+__getVal(inst[3], inst[4], "sthread"))
+   out.append(__getVal(inst[1], inst[2], "thread")+" = "+__getVal(inst[3], inst[4], "thread"))
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
-#make this an actual function in the header that is simply called
 def __inst_terminate(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//terminate")
-   out.append("this.ti1 = (int)(sthread.threadvars[1]);")
-   out.append("if (sthread.threadvars[0] >= 0.0f)")
-   out.append("{")
-   out.append("    this.ti2 = this.threads.get((int)(sthread.threadvars[0])).children.indexOf((int)ti1);")
-   out.append("    this.threads.get((int)(sthread.threadvars[0])).children.remove(ti2);")
-   out.append("}")
-   out.append("for (int i = 0; i < sthread.children.size(); i++)")
-   out.append("{")
-   out.append("    this.ti2 = sthread.children.get(i).intValue();")
-   out.append("    this.threads.get(this.ti2).threadvars[0] = -1;")
-   out.append("}")
-   out.append("this.threads.remove(this.ti1);")
-   out.append("sthread.threadvars[6] = 1.0f;")
-   out.append("sthread.sleep = 1;")
-   out.append("this.ready_threads.push(sthread);")
-   out.append("return 0;")
+   out.append("tid = thread.threadvars[1]")
+   out.append("if thread.threadvars[0] >= 0:")
+   out.append("   self.threads[thread.threadvars[0]].children.remove(tid)")
+   out.append("for x in thread.children:")
+   out.append("   self.threads[x].threadvars[0] = -1")
+   out.append("del self.threads[tid]")
+   out.append("thread.threadvars[6] = 1.0")
+   #UH OH WE NEED READY THREADS THINGIE HERE 
+   out.append("thread.sleep = 1")
+   out.append("return 0")
    out = __addTabWidth(out, tabwidth)
    return out
 
 def __inst_jmp(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//jmp")
-   out.append("return this.f"+str(lineinfo[int(inst[2])][2])+"(sthread)")
+   out.append("return self.__f"+str(lineinfo[int(inst[2])][2])+"(thread)")
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_add(inst, tabwidth, blocknum, lineinfo, instnum):
    out= []
-   if debug: out.append("//add")
-   out.append(__getVal(inst[1],inst[2],"sthread")+" = "+__getVal(inst[3],inst[4],"sthread")+" + "+__getVal(inst[5],inst[6],"sthread"))
+   out.append(__getVal(inst[1],inst[2],"thread")+" = "+__getVal(inst[3],inst[4],"thread")+" + "+__getVal(inst[5],inst[6],"thread"))
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_sub(inst, tabwidth, blocknum, lineinfo, instnum):
    out= []
-   if debug: out.append("//sub")
-   out.append(__getVal(inst[1],inst[2],"sthread")+" = "+__getVal(inst[3],inst[4],"sthread")+" - "+__getVal(inst[5],inst[6],"sthread"))
+   out.append(__getVal(inst[1],inst[2],"thread")+" = "+__getVal(inst[3],inst[4],"thread")+" - "+__getVal(inst[5],inst[6],"thread"))
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_mul(inst, tabwidth, blocknum, lineinfo, instnum):
    out= []
-   if debug: out.append("//mul")
-   out.append(__getVal(inst[1],inst[2],"sthread")+" = "+__getVal(inst[3],inst[4],"sthread")+" * "+__getVal(inst[5],inst[6],"sthread"))
+   out.append(__getVal(inst[1],inst[2],"thread")+" = "+__getVal(inst[3],inst[4],"thread")+" * "+__getVal(inst[5],inst[6],"thread"))
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_div(inst, tabwidth, blocknum, lineinfo, instnum):
    out= []
-   if debug: out.append("//div")
-   out.append(__getVal(inst[1],inst[2],"sthread")+" = "+__getVal(inst[3],inst[4],"sthread")+" / "+__getVal(inst[5],inst[6],"sthread"))
+   out.append(__getVal(inst[1],inst[2],"thread")+" = "+__getVal(inst[3],inst[4],"thread")+" / "+__getVal(inst[5],inst[6],"thread"))
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_rnd(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//rnd")
-   out.append(__getVal(inst[1],inst[2],"sthread")+" = this.r.nextFloat()")
+   out.append(__getVal(inst[1],inst[2],"thread")+" = self.r.random()")
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_sin(inst, tabwidth, blocknum, lineinfo, instnum):
    out= []
-   if debug: out.append("//sin")
-   out.append(__getVal(inst[1],inst[2],"sthread")+" = (float)(Math.sin("+__getVal(inst[3],inst[4],"sthread")+"))")
+   out.append(__getVal(inst[1],inst[2],"thread")+" = math.sin("+__getVal(inst[3],inst[4],"thread")+")")
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_cos(inst, tabwidth, blocknum, lineinfo, instnum):
    out= []
-   if debug: out.append("//cos")
-   out.append(__getVal(inst[1],inst[2],"sthread")+" = (float)(Math.cos("+__getVal(inst[3],inst[4],"sthread")+"))")
+   out.append(__getVal(inst[1],inst[2],"thread")+" = math.cos("+__getVal(inst[3],inst[4],"thread")+")")
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_mod(inst, tabwidth, blocknum, lineinfo, instnum):
    out= []
-   if debug: out.append("//mod")
-   out.append(__getVal(inst[1],inst[2],"sthread")+" = "+__getVal(inst[3],inst[4],"sthread")+" % "+__getVal(inst[5],inst[6],"sthread"))
+   out.append(__getVal(inst[1],inst[2],"thread")+" = "+__getVal(inst[3],inst[4],"thread")+" % "+__getVal(inst[5],inst[6],"thread"))
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_call(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//call")
-   out.append("sthread.codetop++")
-   out.append("sthread.codestack[sthread.codetop] = "+str(blocknum+1))
-   #out.append("sthread.codestack.add("+str(blocknum+1)+")")
-   out.append("return f"+str(lineinfo[int(inst[2])][2])+"(sthread)")
+   out.append("thread.codestack.append("+str(blocknum+1)+")")
+   out.append("return self.__f"+str(lineinfo[int(inst[2])][2])+"(thread)")
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_return(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//ret")
-   out.append("this.ti1 = sthread.codestack[sthread.codetop]")
-   out.append("sthread.threadvars[3] = "+__getVal(inst[1],inst[2],"sthread"))
-   out.append("sthread.codetop--")
-   out.append("return this.ti1")
+   out.append("thread.threadvars[3] = " + __getVal(inst[1],inst[2],"thread"))
+   out.append("return thread.codestack.pop()")
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_cmp(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//cmp")
-   out.append(__getVal(inst[1],inst[2],"sthread")+" = ("+__getVal(inst[3],inst[4],"sthread")+" "+code2sign[inst[6]]+" "+__getVal(inst[7],inst[8],"sthread")+") ? 1f : 0f")
+   out.append(__getVal(inst[1],inst[2],"thread")+" = "+__getVal(inst[3],inst[4],"thread")+code2sign[inst[6]]+__getVal(inst[7],inst[8],"thread"))
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_cndjmp(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//cndjmp")
-   out.append("if (sthread.threadvars[2] == 1)")
-   out.append("{")
-   out.append("   return this.f"+str(lineinfo[int(inst[2])][2])+"(sthread);")
-   out.append("}")
+   out.append("if thread.threadvars[2]:")
+   out.append("   return self.__f"+str(lineinfo[int(inst[2])][2])+"(thread)")
    out = __addTabWidth(out, tabwidth)
    return out
-
+   
 def __inst_cndcall(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//cndcall")
-   out.append("if (thread.threadvars[2] == 1)")
-   out.append("{")
-   out.append("   sthread.codetop++;")
-   out.append("   sthread.codestack[sthread.codetop] = "+str(blocknum+1)+";")
-   out.append("   return this.f"+str(lineinfo[int(inst[2])][2])+"(sthread);")
-   out.append("}")
+   out.append("if thread.threadvars[2]:")
+   out.append("   thread.codestack.append("+str(blocknum+1)+")")
+   out.append("   return self.__f"+str(lineinfo[int(inst[2])][2])+"(thread)")
    out = __addTabWidth(out, tabwidth)
    return out
    
 def __inst_push(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
    if debug: out.append("//push")
-   out.append("sthread.threadvars[9]+=1.0f")
-   out.append("sthread.varstack[(int)(sthread.threadvars[9])] = "+__getVal(inst[1],inst[2],"sthread"))
+   out.append("thread.threadvars[9] += 1")
+   out.append("thread.varstack[thread.threadvars[9]] = "+__getVal(inst[1],inst[2],"thread"))
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_pop(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//pop")
-   #out.append("this.ti1 = sthread.varstack.size()-1")
-   #out.append("this.tf1 = sthread.varstack.get(this.ti1)")
-   #out.append("sthread.varstack.remove(this.ti1)")
-   out.append(__getVal(inst[1],inst[2],"sthread")+" = sthread.varstack[(int)(sthread.threadvars[9])]")
-   out.append("sthread.threadvars[9]-=1.0f")
+   
+   out.append(__getVal(inst[1],inst[2],"thread")+" = thread.varstack[sthread.threadvars[9]]")
+   out.append("thread.threadvars[9]-=1")
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
    
 def __inst_spawn(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//spawn")
-   out.append("this.ti1 = (int)(sthread.threadvars[1])")
-   out.append("this.ti2 = this.spawnThread("+str(lineinfo[int(inst[2])][2])+", 0, 0, 0, this.ti1)")
-   out.append("sthread.threadvars[4] = (float)(this.ti2)")
+   out.append("pid = thread.threadvars[1]")
+   out.append("t = self.spawnThread("+str(lineinfo[int(inst[2])][2])+", 0, 0, 0, pid)")
+   out.append("thread.threadvars[4] = t")
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
      
 def __inst_gtv(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//gtv")
-   owner = "this.threads.get((int)("+__getVal(inst[5], inst[6], "sthread")+"))"
-   out.append(__getVal(inst[1],inst[2], "sthread")+" = "+__getVal(inst[3], inst[4], owner))
+   owner = "self.threads["+__getVal(inst[5], inst[6], "thread")+"]"
+   out.append(__getVal(inst[1],inst[2], "thread")+" = "+__getVal(inst[3], inst[4], owner))
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_stv(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//stv")
-   owner = "this.threads.get((int)("+__getVal(inst[5], inst[6], "sthread")+"))"
-   out.append(__getVal(inst[1],inst[2], owner)+" = "+__getVal(inst[3], inst[4], "sthread"))
+   owner = "self.threads["+__getVal(inst[5], inst[6], "thread")+"]"
+   out.append(__getVal(inst[1],inst[2], owner)+" = "+__getVal(inst[3], inst[4], "thread"))
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
    
 def __inst_atan2(inst, tabwidth, blocknum, lineinfo, instnum):   
    out= []
-   if debug: out.append("//atan2")
-   out.append("this.tf1 = (float) Math.atan2("+__getVal(inst[3],inst[4],"sthread")+", "+__getVal(inst[5], inst[6], "sthread")+");")
-   out.append("if (this.tf1 < 0.0f)")
-   out.append("{")
-   out.append("   this.tf1 += 6.28318531f;")
-   out.append("}")
-   out.append(__getVal(inst[1], inst[2], "sthread")+" = this.tf1;")
+   out.append("a = math.atan2("+__getVal(inst[3],inst[4],"thread")+", "+__getVal(inst[5], inst[6], "thread")+")")
+   out.append("if a < 0:")
+   out.append("   a += 6.28318531")
+   out.append(__getVal(inst[1], inst[2], "thread")+" = a")
    out = __addTabWidth(out, tabwidth)
    return out
    
@@ -369,47 +307,39 @@ def __inst_trl(inst, tabwidth, blocknum, lineinfo, instnum):
    return ["line1", "line2..."]
    
 def __inst_cid(inst, tabwidth, blocknum, lineinfo, instnum):
-   pid = __getVal(inst[5], inst[6], "sthread")
-   num = __getVal(inst[3], inst[4], "sthread")
-   toval = __getVal(inst[1], inst[2], "sthread")
+   pid = __getVal(inst[5], inst[6], "thread")
+   num = __getVal(inst[3], inst[4], "thread")
+   toval = __getVal(inst[1], inst[2], "thread")
    out = []
-   if debug: out.append("//cid")
-   out.append(toval+" = this.threads.get((int)("+pid+")).children.get((int)("+num+"))")
+   out.append(toval+" = self.threads[int("+pid+")].children[int("+num+")]")
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
    
 def __inst_sqrt(inst, tabwidth, blocknum, lineinfo, instnum):
    out= []
-   if debug: out.append("//sqrt")
-   out.append(__getVal(inst[1],inst[2],"sthread")+" = (float)(Math.sqrt("+__getVal(inst[3],inst[4],"sthread")+"))")
+   out.append(__getVal(inst[1],inst[2],"thread")+" = math.sqrt("+__getVal(inst[3],inst[4],"thread")+")")
    out = __addTabWidth(out, tabwidth)
-   out = __addSemi(out)
    return out
 
 def __inst_peek(inst, tabwidth, blocknum, lineinfo, instnum):
     out = []
-    if debug: out.append("//peek")
-    out.append(__getVal(inst[1],inst[2],"sthread")+" = sthread.varstack[(int)(sthread.threadvars[9])]")
+    out.append(__getVal(inst[1],inst[2],"thread")+" = thread.varstack[thread.threadvars[9]]")
     out = __addTabWidth(out, tabwidth)
-    out = __addSemi(out)
     return out
 
 def __inst_peekat(inst, tabwidth, blocknum, lineinfo, instnum):
     out = []
-    if debug: out.append("//peekat")
-    out.append(__getVal(inst[1],inst[2],"sthread")+" = sthread.varstack[(int)(sthread.threadvars[9]-"+__getVal(inst[3],inst[4],"sthread")+")]")
+    out.append(__getVal(inst[1],inst[2],"thread")+" = thread.varstack[thread.threadvars[9]-"+__getVal(inst[3],inst[4],"thread")+"]")
     out = __addTabWidth(out, tabwidth)
-    out = __addSemi(out)
     return out
 
 def __inst_pokeat(inst, tabwidth, blocknum, lineinfo, instnum):
     out = []
-    if debug: out.append("//pokeat")
-    out.append("sthread.varstack[(int)(sthread.threadvars[9]-"+__getVal(inst[3],inst[4],"sthread")+")] = "+__getVal(inst[1],inst[2],"sthread"))
+    out.append("thread.varstack[thread.threadvars[9]-"+__getVal(inst[3],inst[4],"thread")+"] = "+__getVal(inst[1],inst[2],"thread"))
     out = __addTabWidth(out, tabwidth)
-    out = __addSemi(out)
     return out
+
+#--------------------#
 
 def __inst_sat(inst, tabwidth, blocknum, lineinfo, instnum):
     out = []
@@ -477,50 +407,6 @@ def __inst_acceptmsg(inst, tabwidth, blocknum, lineinfo, instnum):
     out.append("this.declareMessage(sthread, "+__getVal(inst[1],inst[2],"sthread")+");")
     out = __addTabWidth(out, tabwidth)
     return out
-
-__traceflag = False
-
-def __inst_trace(inst, tabwidth, blocknum, lineinfo, instnum):
-    global __traceflag
-    if inst[2] == 0.0:
-       __traceflag = False
-    elif inst[2] == 1.0:
-       __traceflag = True
-    else:
-       raise RuntimeError("Unknown TRACE instruction")
-    return []
-
-def __createPreTraceCode(inst, tabwidth, blocknum, lineinfo, instnum):
-   if not __traceflag and not fulltrace:
-      return []
-   out = []
-   header = 'showFloat(sthread.threadvars[1])+" : '+op2name[inst[0]]+'"'
-   toprint = ''
-   for i,c in enumerate(op2args[inst[0]]):
-      if c != 'i':
-         continue
-      toprint += '+" "+showFloat('+__getVal(inst[2*i+1], inst[2*i+2],"sthread")+')'
-   if toprint != '':
-      if debug: out.append("//pretrace")
-      out.append("System.out.println("+header+toprint+");")
-   out = __addTabWidth(out, tabwidth)
-   return out
-
-def __createPostTraceCode(inst, tabwidth, blocknum, lineinfo, instnum):
-   if not __traceflag and not fulltrace:
-      return []
-   out = []
-   header = '((int) sthread.threadvars[1])+" : '+op2name[inst[0]]+' returned"'
-   toprint = ''
-   for i,c in enumerate(op2args[inst[0]]):
-      if c != 'o':
-         continue
-      toprint += '+" "+showFloat('+__getVal(inst[2*i+1], inst[2*i+2],"sthread")+')'
-   if toprint != '':
-      if debug: out.append("//posttrace")
-      out.append("System.out.println("+header+toprint+");")
-   out = __addTabWidth(out, tabwidth)
-   return out
 
 op2func = {}
 op2func[1.0] = __inst_halt      #halt

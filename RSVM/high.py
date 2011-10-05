@@ -69,3 +69,4 @@ def loadHigh(directory, filename, lib=("./lib/","lib_rsvm.ssc")):
       filestoload.pop(0)
       namespaces.pop(0)
    return (codes, filename.split(".")[0])
+

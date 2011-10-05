@@ -1,7 +1,7 @@
 from rsvmcompiler.languages import fcode
-from rsvmcompiler.languages import java
+from rsvmcompiler.languages import python
 
-graph_info = [fcode, java, 1] #from, to
+graph_info = [fcode, python, 1] #from, to
 
 def doCompile(code):
     f = code[1][0]
@@ -72,7 +72,6 @@ def doCompile(code):
         if pcode[i][-1].strip().split()[0] != "return":
             pcode[i].append("      return this.f"+str((i-2)+1)+"(sthread);")
         #add the ending brace
-        pcode[i].append("    }")
         pcode[i].append("    ")
     
     return (None, pcode[2:])
@@ -435,7 +434,6 @@ op2func[50.0] = __inst_recvwait #recvwait
 op2func[51.0] = __inst_recv     #recv
 op2func[52.0] = __inst_send     #send
 op2func[53.0] = __inst_acceptmsg#accept
-op2func[54.0] = __inst_trace    #trace
 op2func[60.0] = __inst_peek
 op2func[61.0] = __inst_peekat
 op2func[62.0] = __inst_pokeat

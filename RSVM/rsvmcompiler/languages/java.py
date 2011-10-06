@@ -1,7 +1,8 @@
 def constructOutputFiles(code, fname="gen.java"):
     bp = __getBoilerPlateFiles()
     gen = __constructMainFile(code, fname)
-    return bp.update(gen)
+    bp.update(gen)
+    return
 
 def fromString(string):
     return None

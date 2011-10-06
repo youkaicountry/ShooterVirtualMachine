@@ -112,7 +112,7 @@ bp_2="self.statename = {}\n\
    def getThreadChildren(self, threadID):\n\
       return self.threads[threadID].children\n\
    def getState(self, threadID, name):\n\
-      return self.threads[threadID].state[self.statename[name]]\n\   
+      return self.threads[threadID].state[self.statename[name]]\n\
    def getThreadIDs(self):\n\
       return self.threads.keys()\n\
    def run(self):\n\
@@ -121,5 +121,5 @@ bp_2="self.statename = {}\n\
          while thread.sleep <= 0:\n\
             thread.codeloc = self.block2func[thread.codeloc](thread)\n\
          thread.sleep -= 1\n\
-      return\n\".split("\n")
+      return\n".split("\n")
       

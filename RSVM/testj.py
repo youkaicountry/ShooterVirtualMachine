@@ -14,9 +14,13 @@ print(code)
 com = rsvmcompiler.CompilerChain([FCode2Python, FASM2FCode, High2FASM])
 outcode = com.doCompile(code, python)
 
-for l in outcode[1]:
-    for o in l:
-        print(o)
+#for l in outcode[1]:
+#    for o in l:
+#        print(o)
+
+opf = python.constructOutputFiles(outcode)
+print(opf)
+
 
 #print(com.graph.getVertexList())
 

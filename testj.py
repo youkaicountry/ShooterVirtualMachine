@@ -7,7 +7,7 @@ from rsvmcompiler.languages import fcode
 from rsvmcompiler.languages import fasm
 from rsvmcompiler.languages import high
 
-code = high.loadFromFile("../barrages/cirno/", "cirno1.ssc")
+code = high.loadFromFile("./barrages/cirno/", "cirno1.ssc")
 
 print(code)
 
@@ -21,6 +21,11 @@ outcode = com.doCompile(code, python)
 opf = python.constructOutputFiles(outcode)
 print(opf)
 
+for k in opf:
+    f = open(k, "w")
+    ll = [l+"\n" for l in opf[k]]
+    f.writelines(ll)
+    f.close()
 
 #print(com.graph.getVertexList())
 

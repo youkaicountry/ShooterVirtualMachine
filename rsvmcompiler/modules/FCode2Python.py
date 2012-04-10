@@ -257,7 +257,7 @@ def __inst_cndcall(inst, tabwidth, blocknum, lineinfo, instnum):
    
 def __inst_push(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
-   if debug: out.append("//push")
+   if debug: out.append("#push")
    out.append("thread.threadvars[9] += 1")
    out.append("thread.varstack[thread.threadvars[9]] = "+__getVal(inst[1],inst[2],"thread"))
    out = __addTabWidth(out, tabwidth)

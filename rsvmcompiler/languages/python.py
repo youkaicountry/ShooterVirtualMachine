@@ -71,7 +71,7 @@ class RSVM:\n\
 
 
 
-bp_2="self.statename = {}\n\
+bp_2="      self.statename = {}\n\
       self.statename['x'] = 0\n\
       self.statename['__x'] = 0\n\
       self.statename['y'] = 1\n\

@@ -56,7 +56,8 @@ class Thread:\n\
       self.threadvars[0] = -1\n\
 \n\
 class RSVM:\n\
-   def __init__(self, r = random.Random(), memsize=64, regsize=32):\n\
+   def __init__(self, r = None, memsize=64, regsize=32):\n\
+      if r is None: r = random.Random()\n\
       self.threads = {}\n\
       self.mem = []\n\
       self.r = r\n\

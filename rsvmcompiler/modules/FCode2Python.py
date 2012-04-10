@@ -259,14 +259,14 @@ def __inst_push(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
    if debug: out.append("#push")
    out.append("thread.threadvars[9] += 1")
-   out.append("thread.varstack[thread.threadvars[9]] = "+__getVal(inst[1],inst[2],"thread"))
+   out.append("thread.varstack[int(thread.threadvars[9])] = "+__getVal(inst[1],inst[2],"thread"))
    out = __addTabWidth(out, tabwidth)
    return out
 
 def __inst_pop(inst, tabwidth, blocknum, lineinfo, instnum):
    out = []
    
-   out.append(__getVal(inst[1],inst[2],"thread")+" = thread.varstack[sthread.threadvars[9]]")
+   out.append(__getVal(inst[1],inst[2],"thread")+" = thread.varstack[int(thread.threadvars[9])]")
    out.append("thread.threadvars[9]-=1")
    out = __addTabWidth(out, tabwidth)
    return out
@@ -322,19 +322,19 @@ def __inst_sqrt(inst, tabwidth, blocknum, lineinfo, instnum):
 
 def __inst_peek(inst, tabwidth, blocknum, lineinfo, instnum):
     out = []
-    out.append(__getVal(inst[1],inst[2],"thread")+" = thread.varstack[thread.threadvars[9]]")
+    out.append(__getVal(inst[1],inst[2],"thread")+" = thread.varstack[int(thread.threadvars[9])]")
     out = __addTabWidth(out, tabwidth)
     return out
 
 def __inst_peekat(inst, tabwidth, blocknum, lineinfo, instnum):
     out = []
-    out.append(__getVal(inst[1],inst[2],"thread")+" = thread.varstack[thread.threadvars[9]-"+__getVal(inst[3],inst[4],"thread")+"]")
+    out.append(__getVal(inst[1],inst[2],"thread")+" = thread.varstack[int(thread.threadvars[9]-"+__getVal(inst[3],inst[4],"thread")+")]")
     out = __addTabWidth(out, tabwidth)
     return out
 
 def __inst_pokeat(inst, tabwidth, blocknum, lineinfo, instnum):
     out = []
-    out.append("thread.varstack[thread.threadvars[9]-"+__getVal(inst[3],inst[4],"thread")+"] = "+__getVal(inst[1],inst[2],"thread"))
+    out.append("thread.varstack[int(thread.threadvars[9]-"+__getVal(inst[3],inst[4],"thread")+")] = "+__getVal(inst[1],inst[2],"thread"))
     out = __addTabWidth(out, tabwidth)
     return out
 

@@ -38,7 +38,7 @@ def __repr__():
 bp_1="import math\n\
 import random\n\
 class Thread:\n\
-   def __init__(self, codeloc = 0.0, regsize=64):\n\
+   def __init__(self, codeloc = 0.0, regsize=64, stacksize=16):\n\
       self.codeloc = codeloc\n\
       self.registers = []\n\
       for x in xrange(regsize):\n\
@@ -49,9 +49,9 @@ class Thread:\n\
       self.sleep = 0\n\
       self.children = []\n\
       self.codestack=[]\n\
-      self.varstack=[]\n\
+      self.varstack=[0.0 for i in range(stacksize)]\n\
       self.threadvars = []\n\
-      for x in xrange(8):\n\
+      for x in xrange(10):\n\
          self.threadvars.append(0.0)\n\
       self.threadvars[0] = -1\n\
 \n\
@@ -105,6 +105,10 @@ bp_2="      self.statename = {}\n\
          self.threads[nt].threadvars[0] = -1\n\
       self.nextthread += 1\n\
       return nt\n\
+      self.vmdata[0] = x\n\
+      self.vmdata[1] = y\n\
+      return\n\
+   def setPlayerPosition(self, x, y):\n\
       self.vmdata[0] = x\n\
       self.vmdata[1] = y\n\
       return\n\

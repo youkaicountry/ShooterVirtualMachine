@@ -1,9 +1,7 @@
 import sys, pygame
-import RSVM
 import random
 import sys
 pygame.init()
-
 
 try:
    import psyco
@@ -11,8 +9,6 @@ try:
    print "Psyco loaded."
 except ImportError:
    print "Psyco not found."
-
-
 
 size = width, height = 640, 480
 bg = 0, 0, 0
@@ -23,7 +19,7 @@ xx = 0
 yy = 0
 angle = 0
 
-f = sys.argv[1]
+mod = __import__(sys.argv[1])
 xx = float(sys.argv[2])
 yy = float(sys.argv[3])
 angle = float(sys.argv[4])
@@ -33,8 +29,7 @@ screen = pygame.display.set_mode(size)
 ball = pygame.image.load("ball.png")
 player = pygame.image.load("player.png")
 
-code = RSVM.loadFCode(f)
-R = RSVM.RSVM(code)
+R = mod.RSVM()
       
 R.spawnThread(0, xx, yy, angle, None)
 #R.spawnThread(0, xx + 10, yy, 0, 0)
@@ -97,4 +92,3 @@ while True:
         
         pygame.display.flip()
         
-

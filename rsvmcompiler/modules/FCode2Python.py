@@ -70,7 +70,7 @@ def doCompile(code):
    #return the next block if it has not been done
     for i in range(2,len(pcode)):
         if pcode[i][-1].strip().split()[0] != "return":
-            pcode[i].append("      return this.f"+str((i-2)+1)+"(sthread);")
+            pcode[i].append("      return self.__f"+str((i-2)+1)+"(thread);")
         #add the ending brace
         pcode[i].append("    ")
     
